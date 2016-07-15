@@ -24,6 +24,7 @@
 #   项目网址 : https://github.com/qiangbro/SupersamplingOverlay
 #
 
+
 # --- CODE SAMPLES ---
 #
 #   LoadPlugin("E:\program_media\DG2044\dgindexnv\DGDecodeNV.dll")
@@ -72,6 +73,39 @@
 #
 
 
+###---已知问题---
+#
+#   Avisynth+ MT pfmod 开启多线程模式下，可能需要手动设置所用的滤镜的mt模式，否则会报错
+#~  SetFilterMTMode("Eval", 3)
+#
+#   masktools2的mt模式
+#~ SetFilterMTMode("mt_invert",           MT_MULTI_INSTANCE)
+#~ SetFilterMTMode("mt_binarize",         MT_MULTI_INSTANCE)
+#~ SetFilterMTMode("mt_inflate",          MT_MULTI_INSTANCE)
+#~ SetFilterMTMode("mt_deflate",          MT_MULTI_INSTANCE)
+#~ SetFilterMTMode("mt_inpand",           MT_MULTI_INSTANCE)
+#~ SetFilterMTMode("mt_expand",           MT_MULTI_INSTANCE)
+#~ SetFilterMTMode("mt_lut",              MT_MULTI_INSTANCE)
+#~ SetFilterMTMode("mt_lutxy",            MT_MULTI_INSTANCE)
+#~ SetFilterMTMode("mt_lutxyz",           MT_MULTI_INSTANCE)
+#~ SetFilterMTMode("mt_luts",             MT_MULTI_INSTANCE)
+#~ SetFilterMTMode("mt_lutf",             MT_MULTI_INSTANCE)
+#~ SetFilterMTMode("mt_lutsx",            MT_MULTI_INSTANCE)
+#~ SetFilterMTMode("mt_lutspa",           MT_MULTI_INSTANCE)
+#~ SetFilterMTMode("mt_merge",            MT_MULTI_INSTANCE)
+#~ SetFilterMTMode("mt_logic",            MT_MULTI_INSTANCE)
+#~ SetFilterMTMode("mt_convolution",      MT_MULTI_INSTANCE)
+#~ SetFilterMTMode("mt_mappedblur",       MT_MULTI_INSTANCE)
+#~ SetFilterMTMode("mt_makediff",         MT_MULTI_INSTANCE)
+#~ SetFilterMTMode("mt_average",          MT_MULTI_INSTANCE)
+#~ SetFilterMTMode("mt_adddiff",          MT_MULTI_INSTANCE)
+#~ SetFilterMTMode("mt_clamp",            MT_MULTI_INSTANCE)
+#~ SetFilterMTMode("mt_motion",           MT_MULTI_INSTANCE)
+#~ SetFilterMTMode("mt_edge",             MT_MULTI_INSTANCE)
+#~ SetFilterMTMode("mt_hysteresis",       MT_MULTI_INSTANCE)
+#
+
+
 # --- STORY ---
 #
 #   平时接触到的某些TS片源，实际分辨率=1440x1080，显示分辨率=1920x1080
@@ -107,27 +141,6 @@
 #
 
 
-
-
-# --- CHANGELOG ---
-#
-#   2016.6.27, 7.1, 7.12, 7.15
-#   1.1.1 ~ 1.1.4 by Mikey
-#       编写整理文案。当然文案也是脚本的一部分。
-#       私用的函数用双下划线开头。
-#
-#
-#   2016.06.26
-#   1.1 by Mikey
-#       添加模糊功能，支持blur参数。
-#       
-#
-#   2016.6.19
-#   1.0 by Mikey
-#       实现基本功能，支持callback、dar、ss_rate 参数。
-#
-
-
 # --- 名词解释 ---
 #
 #   DAR:
@@ -152,6 +165,25 @@
 #       超取样，一种抗锯齿的原理。
 #       通过插值得到更精细的样本进行取样以实现抗锯齿（可能我表达的并不对）
 #       参考 https://en.wikipedia.org/wiki/Supersampling
+#
+
+
+# --- CHANGELOG ---
+#
+#   2016.6.27, 7.1, 7.12, 7.15
+#   1.1.1 ~ 1.1.4 by Mikey
+#       编写整理文案。当然文案也是脚本的一部分。
+#       私用的函数用双下划线开头。
+#
+#
+#   2016.06.26
+#   1.1 by Mikey
+#       添加模糊功能，支持blur参数。
+#       
+#
+#   2016.6.19
+#   1.0 by Mikey
+#       实现基本功能，支持callback、dar、ss_rate 参数。
 #
 
 
