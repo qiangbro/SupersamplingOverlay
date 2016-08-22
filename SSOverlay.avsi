@@ -14,9 +14,9 @@
 
 
 #
-#   SSOverlay 1.1.4
+#   SSOverlay 1.1.5
 #
-#   利用超取样原理进行高质量的内容覆盖。
+#   利用超取样原理进行内容覆盖。
 #
 #   Author : Mikey
 #   E-mail : qiangbro@qq.com
@@ -27,38 +27,41 @@
 
 # --- CODE SAMPLES ---
 #
-#   LoadPlugin("E:\program_media\DG2044\dgindexnv\DGDecodeNV.dll")
+#   ......
+#
 #   LoadPlugin("E:\program_media\avisynth-plugin\VSFilter-v2.39\VSFilter.dll")
 #   LoadPlugin("E:\program_media\avisynth-plugin\masktools2-x86\masktools2.dll")
 #   Import("E:\program_media\Mikey's Fansub Utilities\avisynth-plugins\SSOverlay.avsi")
 #
-#   DGSource("H:\fansub-work\[任务\2016.05.29 セノビタビ\02-悉尼\src\2016060100350105-フジテレビ-セノビタビ。.dgi")
-#   Trim(936,3632)++Trim(7230,43492)++Trim(47090,47987)++Trim(52035,52633)
+#   ......
 #
 #   SSOverlay("""
-#       TextSub("伸懒腰旅行.悉尼.班花--已翻译--已轴.ass")
-#   """, ss_rate=1.2, blur=0.6)
+#       TextSub("helloworld.ass")
+#   """, dar_fit=16.0/9, ss_rate=1.2, blur=0.7)
 #
 
 
 # --- 使用说明 ---
 #
-#   SSOverlay(clip src, string callback, string "dar", float "ss_rate", float "blur")
+#   SSOverlay(clip src, string callback, float "dar_fit", float "ss_rate", float "blur")
 #
 #   原理:
-#       本函数基于原影片，按照给定的宽高比(dar)、超取样比率(ss_rate)，拉伸出一个超取样影片。
-#       通过在超取样影片上执行回调代码(callback)，添加需要覆盖的内容。
-#       （如：用TextSub/TextSubMod添加ASS字幕，用Overlay函数添加png水印等）
+#       按照给定的宽高比(dar_fit)、超取样比率(ss_rate)，拉伸出一个超取样影片，
+#       通过在超取样影片上执行回调代码(callback)，添加需要覆盖的内容，
+#       （如：用TextSub/TextSubMod添加字幕）
 #       通过进行比较，得到覆盖前后的差异影片。
 #       对差异影片进行模糊处理(blur) 并拉伸回原影片分辨率，与原影片进行合并。
-#       以此实现使覆盖的内容圆滑而不影响原影片画质。
+#
+#   特点：
+#       ① 按需定制所覆盖的内容
+#       ② 画面中未被覆盖内容的画面部分不会有任何改动。
 #
 #   参数:
 #       src: 原影片
-#       callback：向超取样影片添加所需覆盖的内容的回调代码。
-#       dar：覆盖内容的显示宽高比，参与计算超取样影片的分辨率。默认="16/9"
-#       ss_rate：超取样比率，参与计算超取样影片的分辨率。默认=1.0
-#       blur：最终进行模糊处理时的强度。默认=0.0，取值范围0.0~1.58
+#       callback：向超取样影片添加所需覆盖的内容的回调代码，可自主定义所覆盖的内容
+#       ss_rate：超取样拉伸放大的比率，参与计算超取样影片的分辨率。默认=1.0，建议取1.2
+#       dar_fit：通过改变超取样影片的宽度来改变宽高比。不填则采用片源宽高比。hdtv片源应取dar_fit=16.0/9
+#       blur：通过模糊让字幕边缘柔和（仿potplayer挂字幕的感觉）默认=0.0，取值范围0.0~1.58，建议取0.7
 #
 #   返回值：
 #       已完成覆盖的影片。
@@ -67,7 +70,7 @@
 
 # --- REQUIREMENTS ---
 #
-#   Avisynth 2.58 或更高
+#   Avisynth 2.58 或更高版本
 #
 #   MaskTools2 : http://avisynth.nl/index.php/MaskTools2
 #
@@ -75,10 +78,11 @@
 
 ###---已知问题---
 #
-#   Avisynth+ MT pfmod 开启多线程模式下，可能需要手动设置所用的滤镜的mt模式，否则会报错
-#~  SetFilterMTMode("Eval", 3)
+#   如果ss_rate值稍大，使得压制工作效率降低，建议用Avisynth+ MT开多线程
+#   Avisynth+ MT pfmod 在开启多线程时，需要设置以下滤镜的MT模式
 #
-#   masktools2的mt模式
+#~ SetFilterMTMode("Eval", 3)
+#
 #~ SetFilterMTMode("mt_invert",           MT_MULTI_INSTANCE)
 #~ SetFilterMTMode("mt_binarize",         MT_MULTI_INSTANCE)
 #~ SetFilterMTMode("mt_inflate",          MT_MULTI_INSTANCE)
@@ -108,36 +112,24 @@
 
 # --- STORY ---
 #
-#   平时接触到的某些TS片源，实际分辨率=1440x1080，显示分辨率=1920x1080
-#   要向这种片源上用TextSub覆盖字幕的话，需要先将影片拉伸到1920x1080或1280x720，再调用TextSub进行覆盖，
-#   否则，覆盖的字幕比例会不正确，变胖了。
+#   平时接触到的某些TS片源，实际像素分辨率=1440x1080，显示分辨率=1920x1080
+#   要用TextSub向这种片源上覆盖字幕的话，一般需要先将影片拉伸到1920x1080或1280x720，再调用TextSub进行覆盖，
+#   以得到比例正确的字幕。
 #
-#   那么问题就来了。能否以正确的比例向1440x1080分辨率的影片覆盖字幕呢？
+#   那么问题就来了。能否直接向1440x1080分辨率的影片覆盖字幕，且还能保证画面按16:9显示时，字幕是正确的比例呢？
 #
 #   一种简单的方案是将片源拉伸到1920x1080叠加字幕，之后再拉伸回1440x1080。
-#   当然，字幕比例是正确的，但经过两次拉伸，字幕以外的区域图像就被破坏了。
+#   当然，字幕比例是正确的，但图像经过两次拉伸，画质就被破坏了。一般人不会这么做。
 #
-#   有别的办法么？
+#   还有种办法，去Aegisub把字幕拉伸到4:3比例，然后再回到avs用TextSub覆盖。
+#   这是个可行的办法。但是这样创建了成品字幕的一个分支版本。
 #
-#   SSOverlay函数可以不影响不相关的区域，将字幕按正确的比例覆盖到影片上去。
+#   接下来我来介绍使用SSOverlay的办法。
+#   将TextSub语句写入SSOverlay的参数中，并指定dar_fit=16.0/9，即可得到所要的字幕
+#   SSOverlay("""
+#       TextSub("helloworld.ass")
+#   """, dar_fit=16.0/9)
 #
-#
-#   SSOverlay典型应用：
-#       向1440x1080的影片上覆盖按16:9比例设计的ASS字幕
-#       向1440x1080的影片上覆盖按16:9比例设计的PNG水印
-#       让字幕边缘柔和圆滑（像potplayer加载字幕那样）
-#
-#   特点：
-#       ① 可自主定义所覆盖的内容（通过callback参数编写回调代码）
-#       ② 可自主定义所覆盖内容的宽高比例（通过dar参数）
-#       ③ 可自主定义超取样影片的大小（通过ss_rate参数）
-#       ④ 可自主定义所覆盖内容的模糊强度，使所覆盖内容圆滑避免锯齿（通过blur参数）
-#       ⑤ 画面中未被覆盖内容的画面部分不会有任何改动，无画质损失。
-#
-#
-#   使用建议
-#       如果ss_rate值稍大，使得播放很吃力，或者压制时CPU使用率不高，
-#       建议使用多线程，如Avisynth MT、Avisynth+ MT-pfmod
 #
 
 
@@ -158,17 +150,19 @@
 #       SAR × PAR = DAR
 #       PAR = DAR/SAR
 #
-#       以上参考 https://en.wikipedia.org/wiki/Aspect_ratio_(image)
+#       参考 https://en.wikipedia.org/wiki/Aspect_ratio_(image)
 #
 #
 #   Supersampling:
-#       超取样，一种抗锯齿的原理。
-#       通过插值得到更精细的样本进行取样以实现抗锯齿（可能我表达的并不对）
 #       参考 https://en.wikipedia.org/wiki/Supersampling
 #
 
 
 # --- CHANGELOG ---
+#
+#   2016.8.22
+#   1.1.5 by Mikey
+#       去掉dar参数，改为dar_fit
 #
 #   2016.6.27, 7.1, 7.12, 7.15
 #   1.1.1 ~ 1.1.4 by Mikey
@@ -188,21 +182,16 @@
 
 
 
-function SSOverlay(clip src, string callback, string "dar", float "ss_rate", float "blur") {
+function SSOverlay(clip src, string callback, float "dar_fit", float "ss_rate", float "blur") {
     
     callback = Default(callback, """""")
-
-    dar = Default(dar, "16/9")
-    dar_float = Eval("1.00 * " + dar)
-
     ss_rate = Default(ss_rate, 1.0)
-
     blur = Default(blur, 0.0)
 
 
     #创建超取样影片
     ss_h=round(src.height * ss_rate / 4) * 4 #m4(height*1.5)
-    ss_w=round(src.height * ss_rate / 4 * dar_float) * 4 #m4(width*1.5)
+    ss_w=round(Defined(dar_fit) ? (src.height * ss_rate * dar_fit / 4) : (src.width * ss_rate / 4)) * 4 #m4(width*1.5)
     ss_src = BlackmanResize(src, ss_w, ss_h)
     
     #在超取样影片上执行回调代码
