@@ -11,7 +11,7 @@
     
     TextSub("伸懒腰旅行.悉尼.班花--已翻译--已轴.ass")
     
-    """, dar="16/9", ss_rate=1.1, blur=0.4)
+    """, dar_fit=16.0/9, ss_rate=1.2, blur=0.7)
     
 
 Author : Mikey
